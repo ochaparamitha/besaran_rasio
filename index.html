@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RasioKu - Pembelajaran Matematika Interaktif</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f5ff',
+                            100: '#e0ebff',
+                            500: '#4f46e5',
+                            600: '#4338ca',
+                            700: '#3730a3',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX CSS & JS for rendered math formulas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- Canvas Confetti for Reward Animations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .tap-effect:active {
+            transform: scale(0.97);
+        }
+        .katex-display {
+            margin: 0.5em 0 !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 4px 0;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 antialiased font-sans flex flex-col justify-between max-w-md mx-auto bg-slate-50 shadow-2xl relative min-h-screen">
+
+    <!-- TOP APP BAR -->
+    <header class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-3 shadow-xs">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex items-center justify-center shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-calculator text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg leading-tight tracking-tight text-slate-900">Rasio<span class="text-indigo-600">Ku</span></h1>
+                    <p class="text-xs text-slate-500 font-medium">Matematika Interaktif</p>
+                </div>
+            </div>
+            
+            <!-- Overall Progress Widget -->
+            <div class="flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
+                <i class="fa-solid fa-trophy text-amber-500 text-xs"></i>
+                <span id="global-progress-text" class="text-xs font-bold text-indigo-700">0 / 8</span>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-100 h-2 rounded-full mt-2.5 overflow-hidden">
+            <div id="global-progress-bar" class="bg-gradient-to-r from-indigo-500 to-emerald-500 h-full w-0 transition-all duration-500 ease-out"></div>
+        </div>
+    </header>
+
+    <main class="flex-1 px-4 py-4 space-y-4 overflow-y-auto pb-24">
+
+        <!-- HERO / OBJECTIVE CARD -->
+        <section class="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 text-white p-5 rounded-3xl shadow-xl shadow-indigo-200/50 relative overflow-hidden">
+            <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0 mt-0.5">
+                    <i class="fa-solid fa-bullseye text-amber-300"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-200 bg-white/10 px-2 py-0.5 rounded-full">Tujuan Pembelajaran</span>
+                    <h2 class="text-sm font-bold mt-1 text-white leading-snug">
+                        Menentukan Besaran Sebenarnya dari Rasio
+                    </h2>
+                    <p class="text-xs text-indigo-100/90 mt-1.5 leading-relaxed">
+                        Menggunakan rasio untuk menentukan besaran yang belum diketahui serta menyelesaikan masalah sederhana perkalian &amp; pembagian.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- VISUAL RATIO SIMULATOR CARD -->
+        <section class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs font-bold">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Simulasi Interaktif Rasio</h3>
+                </div>
+                <span class="text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">Uji Coba</span>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-xl space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Rasio $A : B$</label>
+                        <select id="sim-ratio" onchange="updateSimulator()" class="w-full bg-white border border-slate-200 rounded-lg p-2 font-medium text-slate-700 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="2:3">2 : 3</option>
+                            <option value="3:5">3 : 5</option>
+                            <option value="4:7">4 : 7</option>
+                            <option value="5:8">5 : 8</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Faktor Pengali ($k$)</label>
+                        <input type="number" id="sim-factor" value="4" min="1" max="20" oninput="updateSimulator()" class="w-full bg-white border border-slate-200 rounded-lg p-2 font-medium text-slate-700 text-xs focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+
+                <!-- Interactive Visual Result -->
+                <div id="sim-result-box" class="p-3 bg-white border border-indigo-100 rounded-xl space-y-2">
+                    <!-- Dynamic Content From JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE PORTALS LIST -->
+        <div class="flex items-center justify-between pt-2">
+            <h3 class="text-sm font-bold text-slate-800">Modul Materi &amp; Latihan</h3>
+            <span class="text-xs text-slate-400">8 Poin Topik</span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3" id="modules-container">
+            <!-- JS will dynamically populate module cards here -->
+        </div>
+
+    </main>
+
+    <!-- MODULE DETAIL OVERLAY (FULL SCREEN MODAL FOR MOBILE) -->
+    <div id="module-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex-col transition-opacity duration-300">
+        <div class="bg-white flex-1 flex flex-col h-full w-full max-w-md mx-auto shadow-2xl overflow-hidden relative">
+            
+            <!-- Modal Header -->
+            <div class="sticky top-0 bg-white/95 backdrop-blur-md border-b border-slate-100 px-4 py-3 flex items-center justify-between z-10">
+                <button onclick="closeModal()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center tap-effect font-bold">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div class="text-center px-2 flex-1">
+                    <span id="modal-mod-category" class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Modul Pembelajaran</span>
+                    <h3 id="modal-mod-title" class="text-sm font-bold text-slate-800 truncate">Judul Modul</h3>
+                </div>
+                <button onclick="toggleBookmark()" class="w-9 h-9 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center tap-effect">
+                    <i id="bookmark-icon" class="fa-regular fa-star text-amber-500"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div id="modal-body" class="flex-1 overflow-y-auto px-5 py-5 space-y-4 text-slate-700 text-sm custom-scrollbar leading-relaxed">
+                <!-- Content injected dynamically via JS -->
+            </div>
+
+            <!-- Modal Bottom Navigation & Completion Bar -->
+            <div class="bg-white border-t border-slate-100 p-4 space-y-3 z-10 shadow-lg">
+                <!-- Checkbox "Saya Sudah Paham" -->
+                <div onclick="toggleModuleCompletion()" class="flex items-center gap-3 p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl cursor-pointer tap-effect">
+                    <input type="checkbox" id="modal-checkbox" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 pointer-events-none">
+                    <label for="modal-checkbox" class="text-xs font-semibold text-indigo-900 cursor-pointer pointer-events-none select-none">
+                        Saya Sudah Paham Materi Ini
+                    </label>
+                </div>
+
+                <!-- Prev / Next Navigation -->
+                <div class="flex items-center gap-2">
+                    <button id="btn-prev" onclick="navigateModule(-1)" class="flex-1 py-3 px-4 bg-slate-100 text-slate-700 font-bold rounded-xl text-xs flex items-center justify-center gap-2 tap-effect disabled:opacity-40 disabled:pointer-events-none">
+                        <i class="fa-solid fa-chevron-left text-xs"></i> Sebelumnya
+                    </button>
+                    <button id="btn-next" onclick="navigateModule(1)" class="flex-1 py-3 px-4 bg-indigo-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md shadow-indigo-200 tap-effect disabled:opacity-40 disabled:pointer-events-none">
+                        Selanjutnya <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* All LaTeX math escapes inside JS backtick literals use double-backslash (\\div, \\times, \\rightarrow) 
+           or direct clean unicode mathematical symbols (÷, ×, →, :) to guarantee crisp rendering */
+        const MODULES_DATA = [
+            {
+                id: 1,
+                code: "A",
+                title: "Mengingat Kembali Konsep Rasio",
+                subtitle: "Pengertian & Contoh Dasar Rasio",
+                icon: "fa-brain",
+                color: "from-blue-500 to-indigo-600",
+                badgeBg: "bg-blue-50 text-blue-700 border-blue-100",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3.5 bg-indigo-50 rounded-2xl border border-indigo-100 text-indigo-900 text-xs leading-relaxed">
+                            <p class="font-bold mb-1 text-indigo-950 flex items-center gap-1.5">
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i> Pengertian Rasio
+                            </p>
+                            <p><strong>Rasio</strong> adalah perbandingan dua besaran yang sama. Rasio ditulis menggunakan tanda <strong>":"</strong>.</p>
+                        </div>
+
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-xs text-center space-y-2">
+                            <p class="text-xs text-slate-500 uppercase font-semibold">Bentuk Penulisan</p>
+                            <div class="text-2xl font-extrabold text-indigo-600">$2 : 3$</div>
+                            <p class="text-xs text-slate-600 italic">Dibaca: "dua berbanding tiga"</p>
+                        </div>
+
+                        <p class="text-xs text-slate-600">
+                            Artinya, setiap <strong>2 bagian</strong> dari besaran pertama berhubungan dengan <strong>3 bagian</strong> dari besaran kedua. Rasio dapat dinyatakan dalam bentuk $a : b$ dan dibaca "rasio $a$ terhadap $b$".
+                        </p>
+
+                        <div class="space-y-2 pt-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Contoh-Contoh Dasar:</h4>
+                            
+                            <!-- Contoh 1 -->
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-indigo-600">Contoh 1:</p>
+                                <p>Diketahui Rasio $A : B = 2 : 3$</p>
+                                <p>Artinya: $A$ mempunyai 2 bagian, dan $B$ mempunyai 3 bagian.</p>
+                                <p class="font-bold text-slate-800">Jadi: $A : B = 2 : 3$</p>
+                            </div>
+
+                            <!-- Contoh 2 -->
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-indigo-600">Contoh 2:</p>
+                                <p>Diketahui Rasio $P : Q = 4 : 5$</p>
+                                <p>Artinya: $P$ mempunyai 4 bagian, dan $Q$ mempunyai 5 bagian.</p>
+                                <p class="font-bold text-slate-800">Jadi: $P : Q = 4 : 5$</p>
+                            </div>
+
+                            <!-- Contoh 3 -->
+                            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                                <span class="font-bold text-amber-800 flex items-center gap-1">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Contoh 3 (SANGAT PENTING!):
+                                </span>
+                                <p>Diketahui Rasio $X : Y = 3 : 7$</p>
+                                <p>Perhatikan bahwa $3$ dan $7$ <strong>belum tentu merupakan jumlah sebenarnya</strong>.</p>
+                                <div class="p-2 bg-white rounded-lg font-bold text-center border border-amber-200 text-amber-900 my-1">
+                                    "Angka pada rasio menunjukkan perbandingan, bukan selalu jumlah sebenarnya."
+                                </div>
+                                <p class="text-[11px] text-amber-800">
+                                    Misalnya $X : Y = 3 : 7$ belum tentu $X = 3$ dan $Y = 7$. Bisa saja jumlah sebenarnya:<br>
+                                    • $X = 6$ dan $Y = 14$<br>
+                                    • $X = 9$ dan $Y = 21$<br>
+                                    • $X = 12$ dan $Y = 28$<br>
+                                    • $X = 15$ dan $Y = 35$<br>
+                                    Semuanya memiliki rasio yang sama yaitu $3 : 7$.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 2,
+                code: "B",
+                title: "Menyatakan dan Membaca Rasio",
+                subtitle: "Pentingnya Urutan Perbandingan",
+                icon: "fa-arrow-right-arrow-left",
+                color: "from-purple-500 to-indigo-600",
+                badgeBg: "bg-purple-50 text-purple-700 border-purple-100",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3.5 bg-rose-50 border border-rose-100 rounded-2xl text-xs text-rose-900">
+                            <p class="font-bold mb-1 flex items-center gap-1.5 text-rose-950">
+                                <i class="fa-solid fa-circle-exclamation text-rose-500"></i> Perhatikan Urutan Rasio!
+                            </p>
+                            <p>Dalam matematika, bentuk $a : b$ memiliki makna yang <strong>berbeda</strong> dengan $b : a$. Urutan menyebutkan sangat penting!</p>
+                        </div>
+
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-3">
+                            <div class="p-2.5 bg-slate-50 rounded-xl text-xs space-y-1">
+                                <div class="font-bold text-indigo-600">$A : B = 2 : 5$</div>
+                                <div class="text-slate-600 font-medium">Artinya: $A$ dibandingkan dengan $B$ adalah $2$ berbanding $5$.</div>
+                            </div>
+
+                            <div class="p-2.5 bg-slate-50 rounded-xl text-xs space-y-1">
+                                <div class="font-bold text-purple-600">$B : A = 5 : 2$</div>
+                                <div class="text-slate-600 font-medium">Jika urutannya dibalik, artinya berbeda!</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Contoh Kasus Urutan:</h4>
+
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-slate-800">Contoh 1:</p>
+                                <p>Jika $A : B = 3 : 4$, maka:</p>
+                                <p>• $A$ terhadap $B = 3 : 4$</p>
+                                <p>• $B$ terhadap $A = 4 : 3$</p>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-slate-800">Contoh 2:</p>
+                                <p>Jika $C : D = 5 : 2$, maka:</p>
+                                <p>• $C$ terhadap $D = 5 : 2$</p>
+                                <p>• $D$ terhadap $C = 2 : 5$</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 bg-indigo-600 text-white rounded-2xl text-xs text-center font-semibold space-y-1">
+                            <p class="text-amber-300 font-bold">💡 INGAT ATURAN INI:</p>
+                            <p>Jika soal mengatakan "A terhadap B" $\\rightarrow A : B$</p>
+                            <p>Jika soal mengatakan "B terhadap A" $\\rightarrow B : A$</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                code: "C",
+                title: "Menyederhanakan Rasio",
+                subtitle: "Menggunakan FPB untuk Bentuk Paling Sederhana",
+                icon: "fa-compress",
+                color: "from-emerald-500 to-teal-600",
+                badgeBg: "bg-emerald-50 text-emerald-700 border-emerald-100",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3.5 bg-emerald-50 border border-emerald-100 rounded-2xl text-xs text-emerald-900">
+                            <p class="font-bold mb-1">Cara Menyederhanakan Rasio:</p>
+                            <p>Bagilah kedua bilangan rasio dengan bilangan yang sama (biasanya menggunakan <strong>FPB</strong> dari kedua bilangan tersebut).</p>
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <!-- Contoh 1 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1">
+                                <div class="font-bold text-emerald-600">Contoh 1: Sederhanakan $6 : 9$</div>
+                                <p class="text-slate-600">FPB dari $6$ dan $9$ adalah $3$.</p>
+                                <p class="font-mono bg-slate-50 p-2 rounded text-slate-800">$6 \\div 3 : 9 \\div 3 = 2 : 3$</p>
+                                <p class="font-bold text-slate-800">Jadi: $6 : 9 = 2 : 3$</p>
+                            </div>
+
+                            <!-- Contoh 2 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1">
+                                <div class="font-bold text-emerald-600">Contoh 2: Sederhanakan $8 : 12$</div>
+                                <p class="text-slate-600">FPB dari $8$ dan $12$ adalah $4$.</p>
+                                <p class="font-mono bg-slate-50 p-2 rounded text-slate-800">$8 \\div 4 : 12 \\div 4 = 2 : 3$</p>
+                                <p class="font-bold text-slate-800">Jadi: $8 : 12 = 2 : 3$</p>
+                            </div>
+
+                            <!-- Contoh 3 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1">
+                                <div class="font-bold text-emerald-600">Contoh 3: Sederhanakan $15 : 20$</div>
+                                <p class="text-slate-600">FPB dari $15$ dan $20$ adalah $5$.</p>
+                                <p class="font-mono bg-slate-50 p-2 rounded text-slate-800">$15 \\div 5 : 20 \\div 5 = 3 : 4$</p>
+                                <p class="font-bold text-slate-800">Jadi: $15 : 20 = 3 : 4$</p>
+                            </div>
+
+                            <!-- Contoh 4 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1">
+                                <div class="font-bold text-emerald-600">Contoh 4: Sederhanakan $18 : 24$</div>
+                                <p class="text-slate-600">FPB dari $18$ dan $24$ adalah $6$.</p>
+                                <p class="font-mono bg-slate-50 p-2 rounded text-slate-800">$18 \\div 6 : 24 \\div 6 = 3 : 4$</p>
+                                <p class="font-bold text-slate-800">Jadi: $18 : 24 = 3 : 4$</p>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 bg-indigo-50 border border-indigo-100 rounded-2xl text-xs text-indigo-900 space-y-1.5">
+                            <p class="font-bold text-indigo-950">Hal Penting yang Harus Diingat:</p>
+                            <p>Perhatikan bahwa $2 : 3$ dan $6 : 9$ memang ditulis berbeda, tetapi mempunyai perbandingan yang sama.</p>
+                            <p class="font-semibold text-center bg-white p-2 rounded-xl border border-indigo-100">$2 \\times 3 = 6$ dan $3 \\times 3 = 9 \\implies 2 : 3 = 6 : 9$</p>
+                            <p class="text-[11px] text-indigo-800">Hal inilah yang akan kita gunakan untuk menentukan besaran sebenarnya.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                code: "D",
+                title: "Rasio vs Besaran Sebenarnya",
+                subtitle: "Memahami Hubungan Pengali",
+                icon: "fa-scale-balanced",
+                color: "from-amber-500 to-orange-600",
+                badgeBg: "bg-amber-50 text-amber-700 border-amber-100",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3.5 bg-amber-50 border border-amber-100 rounded-2xl text-xs text-amber-900 font-medium leading-relaxed">
+                            Ini adalah bagian paling penting dari materi. Angka $2$ dan $3$ pada rasio $A : B = 2 : 3$ disebut sebagai <strong>angka rasio</strong>. Namun jumlah sebenarnya dapat lebih besar!
+                        </div>
+
+                        <!-- Table Visual -->
+                        <div class="overflow-hidden border border-slate-200 rounded-2xl text-xs">
+                            <table class="w-full text-left border-collapse">
+                                <thead class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2.5">Perkalian</th>
+                                        <th class="p-2.5 text-center">Rasio ($A : B$)</th>
+                                        <th class="p-2.5 text-center">Besaran Sebenarnya</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr class="bg-white">
+                                        <td class="p-2.5 font-medium text-slate-500">Awal</td>
+                                        <td class="p-2.5 text-center font-bold text-indigo-600">2 : 3</td>
+                                        <td class="p-2.5 text-center font-bold">2 dan 3</td>
+                                    </tr>
+                                    <tr class="bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-500">Dikalikan 2</td>
+                                        <td class="p-2.5 text-center font-bold text-indigo-600">2 : 3</td>
+                                        <td class="p-2.5 text-center font-bold">4 dan 6</td>
+                                    </tr>
+                                    <tr class="bg-white">
+                                        <td class="p-2.5 font-medium text-slate-500">Dikalikan 3</td>
+                                        <td class="p-2.5 text-center font-bold text-indigo-600">2 : 3</td>
+                                        <td class="p-2.5 text-center font-bold">6 dan 9</td>
+                                    </tr>
+                                    <tr class="bg-slate-50">
+                                        <td class="p-2.5 font-medium text-slate-500">Dikalikan 4</td>
+                                        <td class="p-2.5 text-center font-bold text-indigo-600">2 : 3</td>
+                                        <td class="p-2.5 text-center font-bold">8 dan 12</td>
+                                    </tr>
+                                    <tr class="bg-white">
+                                        <td class="p-2.5 font-medium text-slate-500">Dikalikan 5</td>
+                                        <td class="p-2.5 text-center font-bold text-indigo-600">2 : 3</td>
+                                        <td class="p-2.5 text-center font-bold">10 dan 15</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="p-3 bg-slate-900 text-white rounded-2xl text-xs text-center font-mono font-bold tracking-wide">
+                            2 : 3 = 4 : 6 = 6 : 9 = 8 : 12 = 10 : 15
+                        </div>
+
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong>Mengapa bisa berbeda?</strong> Karena kedua angka pada rasio dikalikan dengan bilangan yang sama (Faktor Pengali):
+                        </p>
+
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1 font-mono">
+                            <p>• Dikalikan 2: $2 \\times 2 : 3 \\times 2 = 4 : 6$</p>
+                            <p>• Dikalikan 3: $2 \\times 3 : 3 \\times 3 = 6 : 9$</p>
+                            <p>• Dikalikan 4: $2 \\times 4 : 3 \\times 4 = 8 : 12$</p>
+                            <p>• Dikalikan 5: $2 \\times 5 : 3 \\times 5 = 10 : 15$</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 5,
+                code: "E",
+                title: "Menentukan Besaran Sebenarnya",
+                subtitle: "Langkah Demi Langkah dari Nilai yang Diketahui",
+                icon: "fa-calculator",
+                color: "from-sky-500 to-blue-600",
+                badgeBg: "bg-sky-50 text-sky-700 border-sky-100",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3.5 bg-sky-50 border border-sky-100 rounded-2xl text-xs text-sky-900">
+                            <p class="font-bold text-sky-950">Contoh Soal Utama:</p>
+                            <p>Diketahui Rasio $A : B = 2 : 3$ dan $A$ sebenarnya $= 8$. Berapa $B$ sebenarnya?</p>
+                        </div>
+
+                        <!-- Step by Step Box -->
+                        <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 text-xs">
+                            <div class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">1</span>
+                                <div>
+                                    <p class="font-bold text-slate-800">Tulis Rasio</p>
+                                    <p class="text-slate-600">$A : B = 2 : 3$</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">2</span>
+                                <div>
+                                    <p class="font-bold text-slate-800">Masukkan Besaran Sebenarnya</p>
+                                    <p class="text-slate-600">$A$ pada rasio $= 2$, $A$ sebenarnya $= 8 \\implies 2 \\rightarrow 8$</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">3</span>
+                                <div>
+                                    <p class="font-bold text-slate-800">Cari Bilangan Pengali (Faktor)</p>
+                                    <p class="text-slate-600">Dari $2$ menjadi $8 \\implies 8 \\div 2 = 4$ (Faktor $= 4$)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-2.5">
+                                <span class="w-5 h-5 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">4</span>
+                                <div>
+                                    <p class="font-bold text-slate-800">Gunakan Faktor yang Sama pada $B$</p>
+                                    <p class="text-indigo-600 font-bold">$B$ pada rasio $= 3 \\implies 3 \\times 4 = 12$</p>
+                                    <p class="font-bold text-emerald-600">Jadi $B$ sebenarnya $= 12$</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table Summary -->
+                        <div class="overflow-hidden border border-slate-200 rounded-xl text-xs">
+                            <table class="w-full text-center border-collapse">
+                                <thead class="bg-slate-100 font-bold border-b border-slate-200">
+                                    <tr>
+                                        <th class="p-2 border-r"></th>
+                                        <th class="p-2 text-indigo-600">A</th>
+                                        <th class="p-2 text-purple-600">B</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-slate-100">
+                                        <td class="p-2 font-semibold text-slate-500 text-left bg-slate-50">Rasio</td>
+                                        <td class="p-2 font-bold">2</td>
+                                        <td class="p-2 font-bold">3</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-2 font-semibold text-slate-500 text-left bg-slate-50">Besaran Sebenarnya</td>
+                                        <td class="p-2 font-bold text-indigo-600">8</td>
+                                        <td class="p-2 font-bold text-emerald-600">12</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Contoh Kasus Lain -->
+                        <div class="space-y-2 pt-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Contoh-Contoh Lain:</h4>
+
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-indigo-600">Contoh 1:</p>
+                                <p>Diketahui $A : B = 3 : 5$. Jika $A = 12$, tentukan $B$.</p>
+                                <p>• Dari $3 \\rightarrow 12$, faktor pengali: $12 \\div 3 = 4$</p>
+                                <p>• Maka $B = 5 \\times 4 = 20$</p>
+                                <p class="font-bold text-slate-800">Jadi: $B = 20$</p>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-indigo-600">Contoh 2:</p>
+                                <p>Diketahui $P : Q = 4 : 7$. Jika $P = 20$, tentukan $Q$.</p>
+                                <p>• Dari $4 \\rightarrow 20$, faktor pengali: $20 \\div 4 = 5$</p>
+                                <p>• Maka $Q = 7 \\times 5 = 35$</p>
+                                <p class="font-bold text-slate-800">Jadi: $Q = 35$</p>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                                <p class="font-bold text-indigo-600">Contoh 3:</p>
+                                <p>Diketahui $X : Y = 5 : 8$. Jika $X = 25$, tentukan $Y$.</p>
+                                <p>• Dari $5 \\rightarrow 25$, faktor pengali: $25 \\div 5 = 5$</p>
+                                <p>• Maka $Y = 8 \\times 5 = 40$</p>
+                                <p class="font-bold text-slate-800">Jadi: $Y = 40$</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 6,
+                code: "F",
+                title: "Menentukan Besaran dengan Pembagian",
+                subtitle: "Jika Besaran Sebenarnya yang Diketahui Berada di Bagian Kedua",
+                icon: "fa-divide",
+                color: "from-cyan-500 to-blue-600",
+                badgeBg: "bg-cyan-50 text-cyan-700 border-cyan-100",
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3.5 bg-cyan-50 border border-cyan-100 rounded-2xl text-xs text-cyan-950 leading-relaxed">
+                            Kadang-kadang besaran sebenarnya yang diketahui adalah angka pada variabel kedua (misalnya $B$, $Q$, atau $Y$). Kita dapat menggunakan pembagian untuk menemukan faktor pengali terlebih dahulu.
+                        </div>
+
+                        <div class="space-y-2.5">
+                            <!-- Contoh 1 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1.5">
+                                <div class="font-bold text-indigo-600">Contoh 1:</div>
+                                <p>Diketahui $A : B = 2 : 5$. Jika $B = 20$, tentukan $A$.</p>
+                                <div class="p-2 bg-slate-50 rounded-lg space-y-1">
+                                    <p>• $B$ pada rasio $= 5$, $B$ sebenarnya $= 20$</p>
+                                    <p>• Faktor pengali $= 20 \\div 5 = 4$</p>
+                                    <p>• Tentukan $A = 2 \\times 4 = 8$</p>
+                                </div>
+                                <p class="font-bold text-slate-800">Jadi: $A = 8$</p>
+                            </div>
+
+                            <!-- Contoh 2 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1.5">
+                                <div class="font-bold text-indigo-600">Contoh 2:</div>
+                                <p>Diketahui $P : Q = 3 : 7$. Jika $Q = 28$, tentukan $P$.</p>
+                                <div class="p-2 bg-slate-50 rounded-lg space-y-1">
+                                    <p><strong>Langkah 1 (Cari Faktor):</strong> $28 \\div 7 = 4$</p>
+                                    <p><strong>Langkah 2 (Kalikan Rasio P):</strong> $3 \\times 4 = 12$</p>
+                                </div>
+                                <p class="font-bold text-slate-800">Jadi: $P = 12$</p>
+                            </div>
+
+                            <!-- Contoh 3 -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs space-y-1.5">
+                                <div class="font-bold text-indigo-600">Contoh 3:</div>
+                                <p>Diketahui $X : Y = 4 : 9$. Jika $Y = 36$, tentukan $X$.</p>
+                                <div class="p-2 bg-slate-50 rounded-lg space-y-1">
+                                    <p>• Cari faktor: $36 \\div 9 = 4$</p>
+                                    <p>• Tentukan $X = 4 \\times 4 = 16$</p>
+                                </div>
+                                <p class="font-bold text-slate-800">Jadi: $X = 16$</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 7,
+                code: "G & I",
+                title: "Pola Rumus & Inti Materi",
+                subtitle: "Ringkasan Rumus Cepat & 3 Hal Utama",
+                icon: "fa-key",
+                color: "from-rose-500 to-pink-600",
+                badgeBg: "bg-rose-50 text-rose-700 border-rose-100",
+                content: `
+                    <div class="space-y-4">
+                        <!-- Pola Utama -->
+                        <div class="p-4 bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl space-y-2 shadow-md">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-300">POLA RUMUS YANG HARUS DIINGAT</span>
+                            <div class="p-3 bg-white/10 rounded-xl text-xs font-mono space-y-2 border border-white/10">
+                                <p class="text-amber-300 font-bold">1. FAKTOR PENGALI =</p>
+                                <p class="pl-3">Besaran Sebenarnya Diketahui $\\div$ Angka Rasio Diketahui</p>
+                                <p class="text-emerald-300 font-bold pt-1">2. BESARAN DICARI =</p>
+                                <p class="pl-3">Angka Rasio Dicari $\\times$ Faktor Pengali</p>
+                            </div>
+                        </div>
+
+                        <!-- Contoh Pola -->
+                        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1">
+                            <span class="font-bold text-slate-800">Contoh Aplikasi Pola:</span>
+                            <p>Rasio $2 : 5$, Besaran sebenarnya yang diketahui $= 20$ (untuk angka rasio 5).</p>
+                            <p>• Faktor Pengali: $20 \\div 5 = 4$</p>
+                            <p>• Besaran Dicari: $2 \\times 4 = 8$</p>
+                            <p class="font-bold text-indigo-600">Jadi besaran yang belum diketahui adalah 8.</p>
+                        </div>
+
+                        <!-- 3 Hal Utama -->
+                        <div class="space-y-2">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">3 Inti Penting:</h4>
+                            
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 text-xs flex gap-2.5">
+                                <span class="font-bold text-indigo-600 text-sm">1</span>
+                                <p><strong>Angka rasio bukan selalu jumlah sebenarnya.</strong> Contoh $2 : 3$ tidak selalu berarti $2$ dan $3$, bisa $4$ &amp; $6$, $6$ &amp; $9$, $8$ &amp; $12$, dst.</p>
+                            </div>
+
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 text-xs flex gap-2.5">
+                                <span class="font-bold text-indigo-600 text-sm">2</span>
+                                <p><strong>Kedua bagian rasio harus menggunakan faktor yang sama.</strong> Jika $2 : 3$ dikalikan $4$, maka $2 \\times 4 : 3 \\times 4 = 8 : 12$. Tidak boleh hanya satu bagian!</p>
+                            </div>
+
+                            <div class="p-3 bg-white rounded-xl border border-slate-200 text-xs flex gap-2.5">
+                                <span class="font-bold text-indigo-600 text-sm">3</span>
+                                <p><strong>Untuk mencari faktor, gunakan pembagian.</strong> Membagi besaran sebenarnya dengan angka rasionya ($12 \\div 2 = 6$, lalu $3 \\times 6 = 18$).</p>
+                            </div>
+                        </div>
+
+                        <!-- Ringkasan Satu Kalimat -->
+                        <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl text-indigo-950 text-xs leading-relaxed space-y-1">
+                            <span class="font-bold text-indigo-700 block uppercase text-[10px] tracking-wider">Ringkasan Satu Kalimat:</span>
+                            <p class="italic">
+                                "Untuk menentukan besaran sebenarnya yang belum diketahui, cari terlebih dahulu faktor pengalinya dengan membagi besaran sebenarnya yang diketahui dengan angka rasionya, kemudian kalikan angka rasio yang dicari dengan faktor yang sama."
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 8,
+                code: "H",
+                title: "Latihan Pemahaman Konsep",
+                subtitle: "Kuis Soal Murni Angka (Latihan 1-6)",
+                icon: "fa-pen-to-square",
+                color: "from-violet-600 to-indigo-700",
+                badgeBg: "bg-violet-50 text-violet-700 border-violet-100",
+                isQuiz: true,
+                content: `
+                    <div class="space-y-4">
+                        <div class="p-3 bg-violet-50 border border-violet-100 rounded-xl text-xs text-violet-900">
+                            Isi jawaban kamu pada kotak di bawah ini! Tekan tombol <strong>"Cek Jawaban"</strong> untuk memeriksa hasil pekerjaanmu.
+                        </div>
+
+                        <div id="quiz-questions-container" class="space-y-4">
+                            <!-- Injected dynamically by JS -->
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        const QUIZ_QUESTIONS = [
+            { id: 1, ratio: "2 : 3", givenVar: "A", givenVal: 10, targetVar: "B", ratioGiven: 2, ratioTarget: 3, answer: 15 },
+            { id: 2, ratio: "3 : 4", givenVar: "P", givenVal: 15, targetVar: "Q", ratioGiven: 3, ratioTarget: 4, answer: 20 },
+            { id: 3, ratio: "5 : 7", givenVar: "X", givenVal: 20, targetVar: "Y", ratioGiven: 5, ratioTarget: 7, answer: 28 },
+            { id: 4, ratio: "2 : 5", givenVar: "N", givenVal: 25, targetVar: "M", ratioGiven: 5, ratioTarget: 2, answer: 10 },
+            { id: 5, ratio: "4 : 9", givenVar: "D", givenVal: 45, targetVar: "C", ratioGiven: 9, ratioTarget: 4, answer: 20 },
+            { id: 6, ratio: "3 : 8", givenVar: "R", givenVal: 18, targetVar: "S", ratioGiven: 3, ratioTarget: 8, answer: 48 }
+        ];
+
+        /* Application State */
+        let currentModuleIndex = 0;
+        let completedModules = JSON.parse(localStorage.getItem('completed_modules')) || [];
+        let bookmarkedModules = JSON.parse(localStorage.getItem('bookmarked_modules')) || [];
+
+        document.addEventListener("DOMContentLoaded", () => {
+            renderModulesList();
+            updateGlobalProgress();
+            updateSimulator();
+        });
+
+        function renderModulesList() {
+            const container = document.getElementById('modules-container');
+            container.innerHTML = '';
+
+            MODULES_DATA.forEach((mod, index) => {
+                const isCompleted = completedModules.includes(mod.id);
+
+                const cardHTML = `
+                    <div onclick="openModule(${index})" class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm tap-effect cursor-pointer hover:border-indigo-200 transition-all">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr ${mod.color} text-white flex items-center justify-center text-lg shadow-md shrink-0">
+                                    <i class="fa-solid ${mod.icon}"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ${mod.badgeBg}">
+                                            Modul ${mod.code}
+                                        </span>
+                                        ${isCompleted ? '<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full"><i class="fa-solid fa-check"></i> Selesai</span>' : '<span class="text-[10px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">Siap Dibaca</span>'}
+                                    </div>
+                                    <h3 class="text-xs font-bold text-slate-800 mt-1">${mod.title}</h3>
+                                    <p class="text-[11px] text-slate-500 mt-0.5 line-clamp-1">${mod.subtitle}</p>
+                                </div>
+                            </div>
+                            <div class="text-slate-300">
+                                <i class="fa-solid fa-chevron-right text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        function openModule(index) {
+            currentModuleIndex = index;
+            const mod = MODULES_DATA[index];
+
+            document.getElementById('modal-mod-category').innerText = `MODUL ${mod.code}`;
+            document.getElementById('modal-mod-title').innerText = mod.title;
+
+            const modalBody = document.getElementById('modal-body');
+            modalBody.innerHTML = mod.content;
+
+            if (mod.isQuiz) {
+                renderQuizQuestions();
+            }
+
+            const checkbox = document.getElementById('modal-checkbox');
+            checkbox.checked = completedModules.includes(mod.id);
+
+            updateBookmarkIcon();
+
+            document.getElementById('btn-prev').disabled = (index === 0);
+            document.getElementById('btn-next').disabled = (index === MODULES_DATA.length - 1);
+
+            const modal = document.getElementById('module-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            setTimeout(() => {
+                if (window.renderMathInElement) {
+                    renderMathInElement(modalBody, {
+                        delimiters: [
+                            {left: "$$", right: "$$", display: true},
+                            {left: "$", right: "$", display: false}
+                        ]
+                    });
+                }
+            }, 50);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('module-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            renderModulesList();
+        }
+
+        function navigateModule(step) {
+            const newIndex = currentModuleIndex + step;
+            if (newIndex >= 0 && newIndex < MODULES_DATA.length) {
+                openModule(newIndex);
+            }
+        }
+
+        function toggleModuleCompletion() {
+            const modId = MODULES_DATA[currentModuleIndex].id;
+            const checkbox = document.getElementById('modal-checkbox');
+            
+            checkbox.checked = !checkbox.checked;
+
+            if (checkbox.checked) {
+                if (!completedModules.includes(modId)) {
+                    completedModules.push(modId);
+                    confetti({
+                        particleCount: 60,
+                        spread: 60,
+                        origin: { y: 0.8 }
+                    });
+                }
+            } else {
+                completedModules = completedModules.filter(id => id !== modId);
+            }
+
+            localStorage.setItem('completed_modules', JSON.stringify(completedModules));
+            updateGlobalProgress();
+        }
+
+        function updateGlobalProgress() {
+            const total = MODULES_DATA.length;
+            const count = completedModules.length;
+            const pct = Math.round((count / total) * 100);
+
+            document.getElementById('global-progress-text').innerText = `${count} / ${total}`;
+            document.getElementById('global-progress-bar').style.width = `${pct}%`;
+        }
+
+        function toggleBookmark() {
+            const modId = MODULES_DATA[currentModuleIndex].id;
+            if (bookmarkedModules.includes(modId)) {
+                bookmarkedModules = bookmarkedModules.filter(id => id !== modId);
+            } else {
+                bookmarkedModules.push(modId);
+            }
+            localStorage.setItem('bookmarked_modules', JSON.stringify(bookmarkedModules));
+            updateBookmarkIcon();
+        }
+
+        function updateBookmarkIcon() {
+            const modId = MODULES_DATA[currentModuleIndex].id;
+            const icon = document.getElementById('bookmark-icon');
+            if (bookmarkedModules.includes(modId)) {
+                icon.className = "fa-solid fa-star text-amber-500";
+            } else {
+                icon.className = "fa-regular fa-star text-slate-400";
+            }
+        }
+
+        function updateSimulator() {
+            const ratioVal = document.getElementById('sim-ratio').value;
+            const factorVal = parseInt(document.getElementById('sim-factor').value) || 1;
+
+            const [aRatio, bRatio] = ratioVal.split(':').map(Number);
+            const actualA = aRatio * factorVal;
+            const actualB = bRatio * factorVal;
+
+            const box = document.getElementById('sim-result-box');
+            box.innerHTML = `
+                <div class="text-center pb-2 border-b border-slate-100">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold">Langkah Pembuktian</span>
+                    <p class="font-extrabold text-indigo-600 text-sm mt-0.5">
+                        Rasio ${aRatio} : ${bRatio} $\\times$ Faktor (${factorVal}) = ${actualA} : ${actualB}
+                    </p>
+                </div>
+                
+                <div class="space-y-2 pt-1">
+                    <div>
+                        <div class="flex justify-between text-[11px] font-semibold text-slate-600 mb-1">
+                            <span>Besaran A (${aRatio} unit $\\times$ ${factorVal})</span>
+                            <span class="text-indigo-600 font-bold">${actualA}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex gap-0.5 p-0.5">
+                            ${Array(aRatio).fill(0).map(() => `<div class="bg-indigo-500 h-full flex-1 rounded-sm"></div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[11px] font-semibold text-slate-600 mb-1">
+                            <span>Besaran B (${bRatio} unit $\\times$ ${factorVal})</span>
+                            <span class="text-purple-600 font-bold">${actualB}</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden flex gap-0.5 p-0.5">
+                            ${Array(bRatio).fill(0).map(() => `<div class="bg-purple-500 h-full flex-1 rounded-sm"></div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            if (window.renderMathInElement) {
+                renderMathInElement(box, {
+                    delimiters: [{left: "$", right: "$", display: false}]
+                });
+            }
+        }
+
+        function renderQuizQuestions() {
+            const container = document.getElementById('quiz-questions-container');
+            if (!container) return;
+
+            container.innerHTML = QUIZ_QUESTIONS.map((q, idx) => `
+                <div class="p-4 bg-white border border-slate-200 rounded-2xl space-y-3 shadow-2xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">Latihan ${q.id}</span>
+                        <span class="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">Rasio ${q.ratio}</span>
+                    </div>
+
+                    <p class="text-xs text-slate-800 font-semibold leading-relaxed">
+                        Diketahui rasio $${q.givenVar} : ${q.targetVar} = ${q.ratio}$. Jika $${q.givenVar} = ${q.givenVal}$, tentukan nilai $${q.targetVar}$.
+                    </p>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="number" id="quiz-input-${q.id}" placeholder="Nilai ${q.targetVar}..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="checkQuizAnswer(${idx})" class="bg-indigo-600 text-white font-bold px-4 py-2.5 rounded-xl text-xs tap-effect shadow-md shadow-indigo-100">
+                            Cek
+                        </button>
+                    </div>
+
+                    <!-- Feedback Box -->
+                    <div id="quiz-feedback-${q.id}" class="hidden p-3 rounded-xl text-xs space-y-1"></div>
+                </div>
+            `).join('');
+        }
+
+        function checkQuizAnswer(index) {
+            const q = QUIZ_QUESTIONS[index];
+            const input = document.getElementById(`quiz-input-${q.id}`);
+            const feedback = document.getElementById(`quiz-feedback-${q.id}`);
+            const userVal = parseInt(input.value);
+
+            feedback.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'border-emerald-200', 'bg-rose-50', 'text-rose-900', 'border-rose-200');
+            feedback.classList.add('border');
+
+            const factor = q.givenVal / q.ratioGiven;
+
+            if (userVal === q.answer) {
+                feedback.classList.add('bg-emerald-50', 'text-emerald-900', 'border-emerald-200');
+                feedback.innerHTML = `
+                    <div class="font-bold flex items-center gap-1.5 text-emerald-700">
+                        <i class="fa-solid fa-circle-check"></i> Jawaban Benar! (${q.targetVar} = ${q.answer})
+                    </div>
+                    <p class="text-[11px] text-emerald-800">
+                        • Faktor Pengali: $${q.givenVal} \\div ${q.ratioGiven} = ${factor}$<br>
+                        • Besaran $${q.targetVar}$: $${q.ratioTarget} \\times ${factor} = ${q.answer}$
+                    </p>
+                `;
+                confetti({ particleCount: 30, spread: 50, origin: { y: 0.7 } });
+            } else {
+                feedback.classList.add('bg-rose-50', 'text-rose-900', 'border-rose-200');
+                feedback.innerHTML = `
+                    <div class="font-bold flex items-center gap-1.5 text-rose-700">
+                        <i class="fa-solid fa-circle-xmark"></i> Belum Tepat, Coba Lagi!
+                    </div>
+                    <p class="text-[11px] text-rose-800">
+                        💡 Petunjuk: Cari faktor pengali dulu ($${q.givenVal} \\div ${q.ratioGiven} = ?$), lalu kalikan dengan angka rasio $${q.targetVar}$ ($${q.ratioTarget}$).
+                    </p>
+                `;
+            }
+
+            if (window.renderMathInElement) {
+                renderMathInElement(feedback, {
+                    delimiters: [{left: "$", right: "$", display: false}]
+                });
+            }
+        }
+    </script>
+</body>
+</html>
